@@ -1,0 +1,56 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Interactions;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
+namespace RPAProject
+{
+    public class AutomationWeb
+    {
+        private IWebDriver driver;
+
+        public AutomationWeb()
+        {
+            ChromeOptions options = new ChromeOptions();
+            options.AddArguments("--disable-notifications"); // Desativa notificações
+            options.AddArguments("--disable-popup-blocking"); // Desativa bloqueio de pop-ups
+
+            driver = new ChromeDriver(options);
+            driver.Manage().Window.Maximize();
+        }
+
+        public void TesteWeb()
+        {
+            // Acessar site
+            driver.Navigate().GoToUrl("https://10fastfingers.com/typing-test/portuguese");
+
+            // Aceitar cookies
+            driver.FindElement(By.Id("CybotCookiebotDialogBodyButtonDecline")).Click();
+
+            // Espera até que o campo de input esteja visível
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            IWebElement inputField = wait.Until(ExpectedConditions.ElementIsVisible(By.Id("inputfield")));
+
+            // Selecionar sentença
+            IWebElement rowElement = driver.FindElement(By.Id("row1"));
+
+            // Capturar todos os elementos 'span' dentro de 'rowElement'
+            IReadOnlyCollection<IWebElement> spanElements = rowElement.FindElements(By.TagName("span"));
+
+            foreach (IWebElement spanElement in spanElements)
+            {
+                string text = spanElement.Text.Trim();
+
+                // Inserindo no campo de input
+                inputField.SendKeys(text + " ");
+
+                // Aguardar 0,1 segundo
+                System.Threading.Thread.Sleep(100);
+            }
+        }
+    }
+}
